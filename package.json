@@ -1,9 +1,9 @@
 {
-  "name": "ts-cli-app-template",
+  "name": "cmdrun",
   "version": "0.1.0",
-  "description": "An opinionated CLI app template with TypeScript",
+  "description": "A CLI tool to run commands by natural language",
   "bin": {
-    "your-cmd-name": "lib/index.js"
+    "run": "lib/index.js"
   },
   "type": "module",
   "scripts": {
@@ -31,6 +31,7 @@
     "node-emoji": "^2.1.0",
     "rollup": "^3.28.1",
     "ts-node": "^10.9.1",
+    "typechat": "^0.0.10",
     "typescript": "^5.2.2"
   }
 }

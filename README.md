@@ -1,45 +1,40 @@
-# TS CLI App Template
+# Cmdrun
 
 This is a template for a CLI app written in TypeScript.
 
-## Usage
-
-Developing:
-
-```bash
-pnpm install
-pnpm dev
-```
-
-We have integrated [@clack/prompt](https://github.com/natemoo-re/clack) and  [commander.js](https://github.com/tj/commander.js#readme).
+## Example
 
 ```log
-┌  Welcome to TS CLI App Template!
+# Jannchie @ JANNCHIE-DESKTOP in C:\Code\cmdrun on git:main [20:45:20]
+$ run "添加到暂存区"
+┌  Run start
 │
-●  We are using @clack/prompts and commander.js.
+◇  Script generated
 │
-◇  You can see the help message by running: ─╮
-│                                            │
-│  pnpm dev -h                               │
-│                                            │
-├────────────────────────────────────────────╯
+│  git add .
 │
-◇  Is that cool?
-│  yeah
+◇  Tip ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│                                                                                                                                                               │
+│  This command will add all the changes in the current directory to the staging area. Make sure you are in the correct directory before running this command.  │
+│                                                                                                                                                               │
+├───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
 │
-└  Thanks for using TS CLI App Template!
+◇  Do you want to run this script?
+│  Yes
+│
+└  Run complete
 ```
 
-You can see the help message by running:
+## Install
 
 ```bash
-pnpm dev -h
+pnpm install -g cmdrun
 ```
 
-Building:
+## Usage
 
 ```bash
-pnpm build
+run -h
 ```
 
 ## License
