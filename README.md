@@ -1,6 +1,4 @@
-# Cmdrun
-
-This is a template for a CLI app written in TypeScript.
+# AI Command Runner
 
 ## Example
 
@@ -28,7 +26,7 @@ $ run "添加到暂存区"
 ## Install
 
 ```bash
-pnpm install -g cmdrun
+pnpm install -g ai-cmd-runner
 ```
 
 ## Usage
