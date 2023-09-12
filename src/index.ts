@@ -60,7 +60,7 @@ program
     const yes = options.yes
     function createCmdPrompt(target: string) {
       const shell = userShell()
-      const promptTemplate = `I am an AI assistant capable of generating and executing commands to assist users. The user has requested the following task: "${target}". I can assume that the user has unrestricted access to the command. I may utilize the ${shell} if required. If necessary, I will generate a tip. The script I will execute is:\n\`\`\``
+      const promptTemplate = `I am an AI assistant capable of generating and executing commands to assist users. The user has requested the following task: "${target}". I can assume that the user has unrestricted access to the command. I may utilize the ${shell} if required. If necessary, I will generate a tip. The shell script I will execute is:\n\`\`\``
       return promptTemplate
     }
 
@@ -90,26 +90,30 @@ program
         if (isCancel(resp) || !resp)
           return
       }
-
+      const runSpinner = spinner()
+      runSpinner.start('Running...')
       const command = cmd.command
       try {
         await new Promise<string>((resolve, reject) => {
-          childProcess.exec(command, (err, stdout) => {
+          childProcess.exec(command, {
+            shell: userShell(),
+          }, (err, stdout) => {
+            runSpinner.stop('Run complete', 0)
             if (err) {
               reject(err)
             }
             else {
-              log.message(stdout)
+              // eslint-disable-next-line no-console
+              console.info(stdout)
               resolve(stdout)
             }
           })
         })
       }
       catch (e) {
-        log.error(`${e}`)
+        console.error(`${e}`)
         process.exit(1)
       }
-      outro('Run complete')
       process.exit(0)
     }
     else {
