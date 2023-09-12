@@ -16,6 +16,9 @@ interface Config {
 interface ConfigEnv {
   AZURE_OPENAI_API_KEY?: string
   AZURE_OPENAI_ENDPOINT?: string
+  OPENAI_API_KEY?: string
+  OPENAI_ENDPOINT?: string
+  OPENAI_MODEL?: string
 }
 
 const config = await getConfig()
@@ -26,22 +29,32 @@ const model = createLanguageModel(config.env as Record<string, string>)
 const cmdTranslator = createJsonTranslator<Cmd>(model, 'export interface Cmd { shell: \'bash\' | \'powershell\' | \'zsh\'; command: string; tip: string }', 'Cmd')
 async function getConfig(): Promise<Config> {
   const defaultConfig: Config = { env: {} }
+  let config = defaultConfig
   const homeDir = os.homedir()
-  const configPath = path.join(homeDir, '.config', 'cmdrun', 'config.json')
-  if (fs.existsSync(configPath)) {
-    const config = await fs.promises.readFile(configPath, 'utf-8')
-    return JSON.parse(config)
+  const configPath = path.join(homeDir, '.config', 'ai-cmd-runner', 'config.json')
+  if (!fs.existsSync(configPath)) {
+    try {
+      await fs.promises.mkdir(path.dirname(configPath), { recursive: true })
+      await fs.promises.writeFile(configPath, JSON.stringify({}))
+    }
+    catch (e) { }
   }
-  else {
-    await fs.promises.mkdir(path.dirname(configPath), { recursive: true })
-    await fs.promises.writeFile(configPath, JSON.stringify(defaultConfig))
-    return defaultConfig
-  }
+  const homeCfg = await fs.promises.readFile(configPath, 'utf-8')
+  config = { ...config, ...JSON.parse(homeCfg) }
+  if (config.env.AZURE_OPENAI_API_KEY !== undefined && config.env.AZURE_OPENAI_ENDPOINT !== undefined)
+    return config
+  else if (config.env.OPENAI_API_KEY !== undefined && config.env.OPENAI_ENDPOINT !== undefined && config.env.OPENAI_MODEL !== undefined)
+    return config
+
+  log.error('Please set env variables AZURE_OPENAI_API_KEY and AZURE_OPENAI_ENDPOINT or OPENAI_API_KEY, OPENAI_ENDPOINT and OPENAI_MODEL\nYou can edit the config file at ~/.config/ai-cmd-runner/config.json\nOr, you can run the following command to set the env variables:')
+  log.message('  run env <name> <value>')
+  outro('Run failed')
+  process.exit(1)
 }
 
 async function updateEnv(name: keyof ConfigEnv, value: string) {
   const homeDir = os.homedir()
-  const configPath = path.join(homeDir, '.config', 'cmdrun', 'config.json')
+  const configPath = path.join(homeDir, '.config', 'ai-cmd-runner', 'config.json')
   if (!config.env)
     config.env = {}
   config.env[name] = value
@@ -91,8 +104,10 @@ program
         const resp = await confirm({
           message: 'Do you want to run this script?',
         })
-        if (isCancel(resp) || !resp)
-          return
+        if (isCancel(resp) || !resp) {
+          outro('canceled')
+          process.exit(0)
+        }
       }
       const runSpinner = spinner()
       runSpinner.start('Running...')
