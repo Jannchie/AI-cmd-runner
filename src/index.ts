@@ -18,10 +18,10 @@ interface ConfigEnv {
 
 const config = await getConfig()
 
-export interface Cmd { shell: 'bash' | 'powershell' | 'zsh'; command: string; comments: string }
+export interface Cmd { shell: 'bash' | 'powershell' | 'zsh'; command: string; tip: string }
 
 const model = createLanguageModel(config.env as Record<string, string>)
-const cmdTranslator = createJsonTranslator<Cmd>(model, 'export interface Cmd { shell: \'bash\' | \'powershell\' | \'zsh\'; command: string; comments: string }', 'Cmd')
+const cmdTranslator = createJsonTranslator<Cmd>(model, 'export interface Cmd { shell: \'bash\' | \'powershell\' | \'zsh\'; command: string; tip: string }', 'Cmd')
 async function getConfig(): Promise<Config> {
   const defaultConfig: Config = { env: {} }
   const homeDir = os.homedir()
@@ -81,7 +81,8 @@ program
       s.stop('Script generated', 0)
       const cmd = resp.data
       log.message(cmd.command)
-      note(cmd.comments, 'Tip')
+      if (cmd.tip !== '')
+        note(cmd.tip, 'Tip')
       if (!yes) {
         const resp = await confirm({
           message: 'Do you want to run this script?',
