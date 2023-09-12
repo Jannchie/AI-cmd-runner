@@ -54,10 +54,10 @@ program
   .name('run')
   .description('Convert natural language to script')
   .option('-y, --yes', 'Skip confirmation')
-  .arguments('<target>')
-  .action(async (target) => {
-    const options = program.opts()
-    const yes = options.yes
+  .option('-d, --debug', 'Debug mode')
+  .arguments('<goal>')
+  .action(async (goal) => {
+    const { yes, debug } = program.opts()
     function createCmdPrompt(target: string) {
       const shell = userShell()
       const promptTemplate = `I am an AI assistant capable of generating and executing commands to assist users. The user has requested the following task: "${target}". I can assume that the user has unrestricted access to the command. I may utilize the ${shell} if required. If necessary, I will generate a tip. The shell script I will execute is:\n\`\`\``
@@ -67,13 +67,14 @@ program
     const s = spinner()
     intro('Run start')
     s.start('Generate solution...')
-    const strResp = await model.complete(createCmdPrompt(target))
+    const strResp = await model.complete(createCmdPrompt(goal))
     if (!strResp.success) {
       s.stop(strResp.message, 1)
       return
     }
 
-    log.message(strResp.data) // for debug
+    if (debug)
+      log.message(strResp.data) // for debug
 
     s.message('Parsing script...')
     const resp = await cmdTranslator.translate(strResp.data)
