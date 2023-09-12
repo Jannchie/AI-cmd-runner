@@ -3,24 +3,18 @@
 ## Example
 
 ```log
-# Jannchie @ JANNCHIE-DESKTOP in C:\Code\cmdrun on git:main [20:45:20]
-$ run "添加到暂存区"
+$ run "docker downlod and run this image: dperson/torproxy, with auto restart, and expose 9050 port"
 ┌  Run start
 │
 ◇  Script generated
 │
-│  git add .
-│
-◇  Tip ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
-│                                                                                                                                                               │
-│  This command will add all the changes in the current directory to the staging area. Make sure you are in the correct directory before running this command.  │
-│                                                                                                                                                               │
-├───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+│  docker run -d --restart always -p 9050:9050 dperson/torproxy
 │
 ◇  Do you want to run this script?
 │  Yes
 │
-└  Run complete
+◇  Run complete
+b639306084657d5bd0f412e8b7b9fd4f628f29bd36b38eb2e9036a5ba4bca692
 ```
 
 ## Install

@@ -7,6 +7,8 @@ import { confirm, intro, isCancel, log, note, outro, spinner } from '@clack/prom
 import { program } from 'commander'
 import { createJsonTranslator, createLanguageModel } from 'typechat'
 
+const version = process.env.npm_package_version ?? 'unknown'
+
 interface Config {
   env: ConfigEnv
 }
@@ -52,6 +54,7 @@ function isConfigEnvKey(key: string): key is keyof ConfigEnv {
 
 program
   .name('run')
+  .version(version)
   .description('Convert natural language to script')
   .option('-y, --yes', 'Skip confirmation')
   .option('-d, --debug', 'Debug mode')
@@ -65,7 +68,7 @@ program
     }
 
     const s = spinner()
-    intro('Run start')
+    intro(`ai-cmd-runner v${version}`)
     s.start('Generate solution...')
     const strResp = await model.complete(createCmdPrompt(goal))
     if (!strResp.success) {

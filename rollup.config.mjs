@@ -3,6 +3,8 @@ import json from '@rollup/plugin-json'
 import terser from '@rollup/plugin-terser'
 import nodeResolve from '@rollup/plugin-node-resolve'
 import commonjs from '@rollup/plugin-commonjs'
+import replace from '@rollup/plugin-replace'
+import packageJson from './package.json' assert { type: 'json' }
 
 export default {
   input: 'src/index.ts',
@@ -21,6 +23,10 @@ global['__filename'] = fileURLToPath(import.meta.url)`,
     terser(),
     nodeResolve({
       browser: false,
+    }),
+    replace({
+      'preventAssignment': true,
+      'process.env.npm_package_version': `'${packageJson.version}'`,
     }),
   ],
 }
