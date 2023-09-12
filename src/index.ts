@@ -22,7 +22,6 @@ export interface Cmd { shell: 'bash' | 'powershell' | 'zsh'; command: string; co
 
 const model = createLanguageModel(config.env as Record<string, string>)
 const cmdTranslator = createJsonTranslator<Cmd>(model, 'export interface Cmd { shell: \'bash\' | \'powershell\' | \'zsh\'; command: string; comments: string }', 'Cmd')
-
 async function getConfig(): Promise<Config> {
   const defaultConfig: Config = { env: {} }
   const homeDir = os.homedir()
@@ -61,7 +60,7 @@ program
     const yes = options.yes
     function createCmdPrompt(target: string) {
       const shell = userShell()
-      const promptTemplate = `You are an AI assistant who can generate any ${shell} script to help users. Now, the user asks you to "${target}". You can assume that the user has global access to the command, and that the user doesn't need to replace any variables or set any paths. you will run this ${shell} script to help the user.\`\`\``
+      const promptTemplate = `I am an AI assistant capable of generating and executing commands to assist users. The user has requested the following task: "${target}". I can assume that the user has unrestricted access to the command. I may utilize the ${shell} if required. If necessary, I will generate a tip. The script I will execute is:\n\`\`\``
       return promptTemplate
     }
 
@@ -73,6 +72,9 @@ program
       s.stop(strResp.message, 1)
       return
     }
+
+    log.message(strResp.data) // for debug
+
     s.message('Parsing script...')
     const resp = await cmdTranslator.translate(strResp.data)
     if (resp.success) {
@@ -89,7 +91,23 @@ program
       }
 
       const command = cmd.command
-      childProcess.spawn(command, { shell: cmd.shell, stdio: 'inherit' })
+      try {
+        await new Promise<string>((resolve, reject) => {
+          childProcess.exec(command, (err, stdout) => {
+            if (err) {
+              reject(err)
+            }
+            else {
+              log.message(stdout)
+              resolve(stdout)
+            }
+          })
+        })
+      }
+      catch (e) {
+        log.error(`${e}`)
+        process.exit(1)
+      }
       outro('Run complete')
       process.exit(0)
     }
